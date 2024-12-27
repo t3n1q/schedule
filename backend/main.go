@@ -12,18 +12,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Глобальная переменная для соединения с БД
 var db *sql.DB
 
 func main() {
-	// Считываем окружение (из docker-compose или локального)
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	// Формируем строку подключения
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPassword, dbName)
 
@@ -40,10 +37,9 @@ func main() {
 	}
 	fmt.Println("Успешное подключение к БД!")
 
-	// Создаём стандартный mux
 	mux := http.NewServeMux()
 
-	// Регистрируем наши CRUD‑маршруты
+	// CRUD
 	mux.HandleFunc("/api/schedules", handleSchedules)
 	mux.HandleFunc("/api/teachers", handleTeachers)
 	mux.HandleFunc("/api/groups", handleGroups)
@@ -57,38 +53,26 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", corsedMux))
 }
 
-/*
-	=========================================================
-	  CORS‑middleware
-
-=========================================================
-*/
+//CORS
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Разрешим запросы с любого источника (Origin)
-		// Можно указать конкретный, например "http://localhost:3000"
+
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 
-		// Разрешим нужные методы (GET, POST, PUT, DELETE, OPTIONS)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
-		// Разрешим нужные заголовки
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-		// Если это preflight (OPTIONS), просто завершаем
 		if r.Method == http.MethodOptions {
 			return
 		}
-		// Иначе пропускаем дальше
 		next.ServeHTTP(w, r)
 	})
 }
 
-/* =========================================================
-   СТРУКТУРЫ ДАННЫХ
-========================================================= */
 
-// Schedule: используется для POST/PUT (числовые ID)
+
+// POST/PUT (числовые ID)
 type Schedule struct {
 	ID          int    `json:"id"`
 	DayOfWeek   string `json:"dayOfWeek"`
@@ -99,7 +83,7 @@ type Schedule struct {
 	ClassroomID int    `json:"classroomId"`
 }
 
-// ScheduleView: используется для GET (с именами препода, группы, предмета и т.д.)
+// GET
 type ScheduleView struct {
 	ID        int    `json:"id"`
 	DayOfWeek string `json:"dayOfWeek"`
@@ -118,7 +102,6 @@ type ScheduleView struct {
 	ClassroomName string `json:"classroomName"`
 }
 
-// Teacher, Group, Subject, Classroom — для остальных таблиц:
 type Teacher struct {
 	ID       int    `json:"id"`
 	FullName string `json:"fullName"`
@@ -139,17 +122,11 @@ type Classroom struct {
 	RoomName string `json:"roomName"`
 }
 
-/*
-	=========================================================
-	  CRUD: РАСПИСАНИЕ
-
-=========================================================
-*/
+//CRUD
 func handleSchedules(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 
 	case "GET":
-		// Для чтения расписания делаем JOIN, чтобы вернуть читабельные имена
 		query := `
 			SELECT
 				s.id,
@@ -281,12 +258,7 @@ func handleSchedules(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/*
-	=========================================================
-	  CRUD: ПРЕПОДАВАТЕЛИ (teachers)
 
-=========================================================
-*/
 func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
@@ -361,12 +333,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/*
-	=========================================================
-	  CRUD: ГРУППЫ (groups)
 
-=========================================================
-*/
 func handleGroups(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
@@ -440,12 +407,7 @@ func handleGroups(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/*
-	=========================================================
-	  CRUD: ПРЕДМЕТЫ (subjects)
 
-=========================================================
-*/
 func handleSubjects(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
@@ -519,12 +481,7 @@ func handleSubjects(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/*
-	=========================================================
-	  CRUD: АУДИТОРИИ (classrooms)
 
-=========================================================
-*/
 func handleClassrooms(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
