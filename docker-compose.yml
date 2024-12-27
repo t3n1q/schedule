@@ -4,7 +4,7 @@ services:
     container_name: schedule_db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2607
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: schedule_db
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -24,7 +24,7 @@ services:
     environment:
       DB_HOST: db
       DB_USER: postgres
-      DB_PASSWORD: 2607
+      DB_PASSWORD: postgres
       DB_NAME: schedule_db
       DB_PORT: 5432
     networks:
