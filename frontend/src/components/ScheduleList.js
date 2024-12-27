@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getSchedules, deleteSchedule } from '../api';
 
 const ScheduleList = ({ mode }) => {
-  const [schedules, setSchedules] = useState([]); // ПУСТОЙ МАССИВ!
+  const [schedules, setSchedules] = useState([]); 
 
   useEffect(() => {
     fetchSchedules();
@@ -11,10 +11,9 @@ const ScheduleList = ({ mode }) => {
   const fetchSchedules = async () => {
     try {
       const data = await getSchedules();
-      setSchedules(data); // data — массив
+      setSchedules(data); 
     } catch (error) {
       console.error('Ошибка при загрузке расписания:', error);
-      // Даже если ошибка, ставим пустой массив, чтобы не было null.map()
       setSchedules([]);
     }
   };
@@ -22,14 +21,14 @@ const ScheduleList = ({ mode }) => {
   const handleDelete = async (id) => {
     try {
       await deleteSchedule(id);
-      // После удаления обновим список
+   
       setSchedules((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error('Ошибка при удалении расписания:', error);
     }
   };
 
-  // Для упрощения не фильтруем по mode
+
   return (
     <table className="table table-bordered">
       <thead>
