@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS schedules (
       FOREIGN KEY(classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE
 );
 
--- Пример тестовых данных
+
 INSERT INTO teachers (full_name) VALUES ('Куликов И.А.'), ('Сидоров П.П.');
 INSERT INTO groups (group_name) VALUES ('Группа А-1'), ('Группа B-1');
 INSERT INTO subjects (subject_name) VALUES ('Математика'), ('Физика');
